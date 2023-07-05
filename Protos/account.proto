@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option csharp_namespace = "BantuinNexus_gRPC";
+
+package account;
+
+service Account {
+  rpc Register (RegisterReq) returns (RegisterRes);
+  rpc Login (LoginReq) returns (LoginRes);
+}
+
+message RegisterReq {
+  string Name = 1;
+  string Email = 2;
+  string Password = 3;
+}
+
+message RegisterRes {
+  string Name = 1;
+  string Email = 2;
+}
+
+message LoginReq {
+  string Email = 1;
+  string Password = 2;
+}
+
+message LoginRes {
+  string Name = 1;
+  string AccessToken = 2;
+  int32 ExpiredIn = 3;
+}
+
+
