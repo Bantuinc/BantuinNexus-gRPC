@@ -1,0 +1,37 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to VPS
+      run: |
+          ssh -o StrictHostKeyChecking=no ${{ vars.USER_VPS }}@${{ vars.IP_VPS }} "
+            cd ${{ vars.DIR }} ;
+            export DOTNET_ROOT=$HOME/.dotnet ;
+            export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools ;
+            screen -S traktor -X quit ;
+            git checkout appsettings.json ;
+            git checkout Properties/launchSettings.json
+            git pull origin master ;
+            if [ -f appsettings.json ]; then rm appsettings.json; fi ;
+            echo '${{ vars.APP_SETTINGS }}' >> appsettings.json ;
+            if [ -f Properties/launchSettings.json ]; then rm Properties/launchSettings.json; fi ;
+            echo '${{ vars.LAUNCH_SETTINGS }}' >> Properties/launchSettings.json ;
+            screen -S traktor dotnet run
+            echo 'Deployment completed.'
+          "
