@@ -1,8 +1,11 @@
 using BantuinNexus_gRPC;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
+using System.Reflection;
 
 namespace BantuinNexus_gRPC.Services
 {
+    /*[Authorize]*/
     public class GreeterService : Greeter.GreeterBase
     {
         private readonly ILogger<GreeterService> _logger;
@@ -11,12 +14,31 @@ namespace BantuinNexus_gRPC.Services
             _logger = logger;
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        public override async Task SayHello(HelloRequest request, IServerStreamWriter<HelloReply> responseStream, ServerCallContext context)
         {
-            return Task.FromResult(new HelloReply
+            for (int i = 0; i < 30; i++)
             {
-                Message = "Hello " + request.Name
-            });
+                await responseStream.WriteAsync(new HelloReply
+                {
+                    Message = "Hello " + request.Name,
+                    Timestamp = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow)
+                });
+                await Task.Delay(1000);
+
+            }
+        }
+        public override async Task<Tes> SayHelloAgain(IAsyncStreamReader<HelloRequest> requestStream, ServerCallContext context)
+        {
+            var response = new Tes();
+            await foreach (var message in requestStream.ReadAllAsync())
+            {
+                response.Reply.Add(new HelloReply
+                {
+                    Message = "Hello " + message.Name,
+                    Timestamp = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow)
+                });
+            }
+            return response;
         }
     }
 }
