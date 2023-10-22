@@ -70,6 +70,7 @@ namespace BantuinNexus_gRPC.Services
                         name = request.Name,
                         email = request.Email,
                         password = BC.HashPassword(request.Password),
+                        activation_token = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
                     });
                     regResponse = new RegisterRes
                     {
