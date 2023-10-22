@@ -40,5 +40,17 @@ namespace BantuinNexus_gRPC.Services
             }
             return response;
         }
+
+        public override async Task<HelloReply> SayHelloUnary(HelloRequest request, ServerCallContext context)
+        {
+            var response = new HelloReply
+            {
+                Message = "Hello " + request.Name,
+                Timestamp = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.UtcNow)
+            };
+            return response;
+        }
+
+
     }
 }
