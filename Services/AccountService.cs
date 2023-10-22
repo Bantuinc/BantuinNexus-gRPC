@@ -1,4 +1,5 @@
 ﻿using BantuinNexus_gRPC;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using SqlKata.Execution;
 using BC = BCrypt.Net.BCrypt;
@@ -19,12 +20,30 @@ namespace BantuinNexus_gRPC.Services
         {
 
             var queryUser = _db.Query("users").Where("email", request.Email.ToLower()).FirstOrDefault();
-            var authResponse = new LoginRes();
+            var response = new LoginRes();
             if (queryUser != null)
             {
                 if(BC.Verify(request.Password, queryUser.password))
                 {
-                    authResponse = JwtAuthenticationManager.Login(queryUser.name);
+                    IDictionary<string, object> authResponse = JwtAuthenticationManager.Login(queryUser.name);
+                    response = new LoginRes
+                    {
+                        Account = new AccountDetail
+                        {
+                            Id = queryUser.id,
+                            Name = queryUser.name,
+                            Email = queryUser.email,
+                            Status = queryUser.status,
+                            Role = 1
+                        },
+                        Token = new LoginRes.Types.Token
+                        {
+                            AccessToken = (string)authResponse["token"],
+                            Expires = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds + Convert.ToInt32((double)authResponse["expired"])
+                        },
+                        Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
+                    };
+                    
                 }
                 else
                 {
@@ -35,7 +54,7 @@ namespace BantuinNexus_gRPC.Services
             {
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Email atau Password Salah"));
             }
-            return authResponse;
+            return response;
             
         }
 

@@ -7,8 +7,9 @@ namespace BantuinNexus_gRPC
 {
     public static class JwtAuthenticationManager
     {
-        public static LoginRes Login(String name)
+        public static IDictionary<string, object> Login(String name)
         {
+            IDictionary<string, object> authResponse = new Dictionary<string, object>();
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(SettingsConfigHelper.AppSetting("Jwt:SecretKey"));
             var tokenExpires = DateTime.Now.AddMinutes(int.Parse(SettingsConfigHelper.AppSetting("Jwt:Validity")));
@@ -16,7 +17,7 @@ namespace BantuinNexus_gRPC
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("name", name),
+                    new Claim(ClaimTypes.NameIdentifier, name),
                     new Claim(ClaimTypes.Role, "Administrator"),
                 }),
                 Expires = tokenExpires,
@@ -25,12 +26,16 @@ namespace BantuinNexus_gRPC
             var securityToken = jwtSecurityTokenHandler.CreateToken(tokenDescriptor);
             var token = jwtSecurityTokenHandler.WriteToken(securityToken);
 
-            return new LoginRes
+            authResponse.Add("token", token);
+            authResponse.Add("expired", tokenExpires.Subtract(DateTime.Now).TotalSeconds);
+
+            return authResponse;
+            /*return new LoginRes
             {
                 Name = name,
                 AccessToken = token,
                 ExpiredIn = (int)tokenExpires.Subtract(DateTime.Now).TotalSeconds
-            };
+            };*/
         }
     }
 }

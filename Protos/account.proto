@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option csharp_namespace = "BantuinNexus_gRPC";
 
+import "google/protobuf/timestamp.proto";
+
 package account;
 
 service Account {
@@ -9,26 +11,40 @@ service Account {
   rpc Login (LoginReq) returns (LoginRes);
 }
 
+message AccountDetail{
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  int32 status = 4;
+  int32 role = 5;
+}
+
 message RegisterReq {
-  string Name = 1;
-  string Email = 2;
-  string Password = 3;
+  string name = 1;
+  string email = 2;
+  string password = 3;
 }
 
 message RegisterRes {
-  string Name = 1;
-  string Status = 2;
+  string name = 1;
+  string status = 2;
 }
 
 message LoginReq {
-  string Email = 1;
-  string Password = 2;
+  string email = 1;
+  string password = 2;
 }
 
 message LoginRes {
-  string Name = 1;
-  string AccessToken = 2;
-  int32 ExpiredIn = 3;
+	AccountDetail account = 1;
+	message Token {
+		string access_token = 1;
+		int32 expires = 2;
+	}
+	Token token = 2;
+	google.protobuf.Timestamp timestamp = 3;
 }
 
-
+message GetAccountReq {
+  int32 id = 1;
+}
