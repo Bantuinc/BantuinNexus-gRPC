@@ -4,7 +4,7 @@ option csharp_namespace = "BantuinNexus_gRPC";
 
 import "google/protobuf/timestamp.proto";
 
-package account;
+package account_proto;
 
 service Account {
   rpc Register (RegisterReq) returns (RegisterRes);

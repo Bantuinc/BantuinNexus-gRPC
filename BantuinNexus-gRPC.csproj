@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Protos\account_proto.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <Protobuf Include="Protos\account_proto.proto" />
 	  <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
-	  <Protobuf Include="Protos\account.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
