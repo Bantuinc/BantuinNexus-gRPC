@@ -20,7 +20,6 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http1);
     options.ConfigureEndpointDefaults(lo => lo.Protocols = HttpProtocols.Http2);
-
 });
 
 /* 
@@ -79,8 +78,10 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
+app.MapGrpcService<FileTransferService>();
 app.MapGrpcService<GreeterService>().EnableGrpcWeb();
 app.MapGrpcService<AccountService>().EnableGrpcWeb();
+
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();

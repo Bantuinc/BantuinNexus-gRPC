@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option csharp_namespace = "BantuinNexus_gRPC";
+
+package filetransfer;
+
+message FileRequest {
+    string fileName = 1;
+    bytes fileContent = 2;
+}
+
+service FileService {
+    rpc UploadFile(stream FileRequest) returns (FileResponse) {}
+}
+
+message FileResponse {
+    string message = 1;
+}
