@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace BantuinNexus_gRPC.Services
 {
-    /*[Authorize]*/
+    [Authorize]
     public class GreeterService : Greeter.GreeterBase
     {
         private readonly ILogger<GreeterService> _logger;
